@@ -100,13 +100,13 @@ fun PerfilScreen() {
 
                     Column {
                         Text(
-                            "Ana Martinez",
+                            "Erick Quispe",
                             style = MaterialTheme.typography.titleLarge,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
 
                         Text(
-                            "ana.martinez@correo.com",
+                            "Erick.quispe@correo.com",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
