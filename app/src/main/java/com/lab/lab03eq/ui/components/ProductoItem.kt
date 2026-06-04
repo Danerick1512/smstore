@@ -1,15 +1,18 @@
 package com.lab.lab03eq.ui.components
 
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
@@ -21,9 +24,15 @@ import androidx.compose.ui.unit.dp
 import com.lab.lab03eq.model.Producto
 
 @Composable
-fun ProductoItem(producto: Producto) {
+fun ProductoItem(
+    producto: Producto,
+    onToggleFavorite: () -> Unit = {},
+    onClick: () -> Unit = {}
+) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainerLow
         ),
@@ -50,12 +59,12 @@ fun ProductoItem(producto: Producto) {
                         color = MaterialTheme.colorScheme.primary
                     )
 
-                    if (producto.favorito) {
+                    IconButton(onClick = onToggleFavorite) {
                         Icon(
-                            Icons.Filled.Favorite,
-                            contentDescription = "Producto favorito",
-                            tint = MaterialTheme.colorScheme.tertiary,
-                            modifier = Modifier.size(20.dp)
+                            imageVector = if (producto.favorito) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                            contentDescription = if (producto.favorito) "Quitar de favoritos" else "Agregar a favoritos",
+                            tint = if (producto.favorito) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(24.dp)
                         )
                     }
                 }

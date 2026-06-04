@@ -35,6 +35,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,6 +45,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import com.lab.lab03eq.ui.viewmodel.StoreViewModel
 
 data class OpcionPerfil(
     val id: Int,
@@ -60,8 +62,8 @@ private val opcionesPerfil = listOf(
 )
 
 @Composable
-fun PerfilScreen() {
-    var modoOscuro by remember { mutableStateOf(false) }
+fun PerfilScreen(viewModel: StoreViewModel) {
+    val modoOscuro by viewModel.darkMode.collectAsState()
     var notificaciones by remember { mutableStateOf(true) }
 
     LazyColumn(
@@ -106,13 +108,13 @@ fun PerfilScreen() {
                         )
 
                         Text(
-                            "Erick.quispe@correo.com",
+                            "Erick.quispe@unmsm.edu.pe",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
 
                         Text(
-                            "Cliente desde 2024",
+                            "Estudiante desde 2021",
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
@@ -186,7 +188,7 @@ fun PerfilScreen() {
                         trailingContent = {
                             Switch(
                                 checked = modoOscuro,
-                                onCheckedChange = { modoOscuro = it }
+                                onCheckedChange = { viewModel.toggleDarkMode(it) }
                             )
                         }
                     )

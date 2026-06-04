@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -20,7 +21,9 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedButton
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -29,6 +32,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,13 +40,23 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.lab.lab03eq.model.productosDePrueba
+import com.lab.lab03eq.model.Producto
 import com.lab.lab03eq.ui.components.ProductoItem
+import com.lab.lab03eq.ui.viewmodel.StoreViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TiendaScreen() {
+fun TiendaScreen(
+    viewModel: StoreViewModel,
+    onNavigateToDetail: (Int) -> Unit
+) {
     var busqueda by remember { mutableStateOf("") }
     var mostrarFormulario by remember { mutableStateOf(false) }
+    val productos by viewModel.productos.collectAsState()
+    var categoriaSeleccionada by remember { mutableStateOf("Todos") }
+    val categorias = remember(productos) { 
+        listOf("Todos") + productos.map { it.categoria }.distinct() 
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize()) {
@@ -61,13 +75,29 @@ fun TiendaScreen() {
                     .padding(horizontal = 16.dp, vertical = 8.dp)
             )
 
+            LazyRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(categorias) { categoria ->
+                    FilterChip(
+                        selected = categoriaSeleccionada == categoria,
+                        onClick = { categoriaSeleccionada = categoria },
+                        label = { Text(categoria) }
+                    )
+                }
+            }
+
             if (mostrarFormulario) {
                 FormularioRapido()
             }
 
-            val productosFiltrados = productosDePrueba.filter {
-                it.nombre.contains(busqueda, ignoreCase = true) ||
-                        it.categoria.contains(busqueda, ignoreCase = true)
+            val productosFiltrados = productos.filter {
+                (it.nombre.contains(busqueda, ignoreCase = true) ||
+                        it.categoria.contains(busqueda, ignoreCase = true)) &&
+                        (categoriaSeleccionada == "Todos" || it.categoria == categoriaSeleccionada)
             }
 
             if (productosFiltrados.isEmpty()) {
@@ -92,7 +122,13 @@ fun TiendaScreen() {
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     items(productosFiltrados, key = { it.id }) { producto ->
-                        ProductoItem(producto = producto)
+                        ProductoItem(
+                            producto = producto,
+                            onToggleFavorite = {
+                                viewModel.toggleFavorite(producto.id)
+                            },
+                            onClick = { onNavigateToDetail(producto.id) }
+                        )
                     }
                 }
             }
